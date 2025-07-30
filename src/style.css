@@ -1,0 +1,67 @@
+:root {
+	font-family: 'Courier New', Courier, monospace;
+	line-height: 1.5;
+	font-weight: 400;
+
+	color: #223550;
+	background-color: #1a1a1a;
+
+	font-synthesis: none;
+	text-rendering: optimizeLegibility;
+	-webkit-font-smoothing: antialiased;
+	-moz-osx-font-smoothing: grayscale;
+	-webkit-text-size-adjust: 100%;
+}
+
+html,body {
+	touch-action: none;
+	overscroll-behavior: none;
+	user-select: none;
+}
+
+body {
+	margin: 0;
+	overflow: hidden;
+	width: 100vw;
+	height:100dvh;
+}
+
+#app {
+	display: flex;
+	flex-direction: column;
+	min-height: 100vh;
+}
+
+header {
+	display: flex;
+	/* justify-content: flex-end; */
+	background-color: #25061c;
+	border-color: #ff61e5;
+	border-bottom-width: 1px;
+	border-bottom-style: solid;
+}
+
+header nav {
+	display: flex;
+}
+
+header a,span {
+	color: #ca2c9b;
+	padding: 0.5rem;
+	text-decoration: none;
+	font-size: large;
+}
+
+header a.active {
+	background-color: #0005;
+}
+
+header a:hover {
+	background-color: #0008;
+}
+
+main {
+	flex: auto;
+	display: flex;
+}
+
