@@ -101,6 +101,7 @@ export class TierItem {
 interface Props {
   data: TierItemData
   onChange: (data: TierItemData)=>void;
+  onClose: ()=>void;
 }
 interface State {
 
@@ -108,13 +109,18 @@ interface State {
 export class TierItemDisplay extends Component<Props,State> {
   render() {
     return <div class="tier-item">
+      <div class="row" style={{alignItems:"space-between"}}>
       { this.props.data.imageUrl &&
       <div class="tier-item-image"
       style={{
         backgroundImage: `url(${this.props.data.imageUrl})`
       }}
       ></div>
-      }
+    }
+      <button class="tier-item-close" onClick={()=>{
+        this.props.onClose()
+      }}>X</button>
+      </div>
       <textarea
         class="tier-item-description"
         value={this.props.data.description||""}

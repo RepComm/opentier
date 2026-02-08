@@ -525,6 +525,11 @@ export class Tier extends Component<Props, State> {
     {this.state.infoItemData &&
      <TierItemDisplay
       data={this.state.infoItemData}
+      onClose={()=>{
+       this.setState({
+        infoItemData: undefined
+       })
+      }}
       onChange={(data)=>{
        this.saveItem(data.id, data)
       }}
