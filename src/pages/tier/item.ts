@@ -73,6 +73,7 @@ export class TierItem {
   const offset = 0.02
   if (highlight) {
    ctx.strokeStyle = this.data.fg;
+   ctx.lineWidth *= 10
    ctx.strokeRect(0-offset, 0-offset, 1+(offset*2), 1+(offset*2))
   }
 
