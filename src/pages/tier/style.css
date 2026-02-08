@@ -57,3 +57,30 @@
  width: 2em;
  background-size: contain;
 }
+
+.tier-item {
+ position: absolute;
+ left: 10vw;
+ width: 80vw;
+ top: 10vh;
+ height: 80vh;
+ background-color: #5c5c5cd0;
+ border-color: white;
+ border-width: 1px;
+ border-style: solid;
+ display: flex;
+ border-radius: 1rem;
+ flex-direction: column;
+}
+
+.tier-item-image {
+ width: 10em;
+ height: 10em;
+ background-size: contain;
+ border-radius: 1rem;
+ align-self: center;
+}
+
+.tier-item-description {
+ min-height: 10em;
+}

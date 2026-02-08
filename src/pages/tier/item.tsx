@@ -1,3 +1,4 @@
+import { Component, ComponentChildren, RenderableProps } from "preact";
 import { Vector } from "../../vector";
 import { getImageFromUrl, Img } from "./img";
 import { Ctx } from "./types";
@@ -73,7 +74,7 @@ export class TierItem {
   this.data.id = idPrefix + hashItemData(this.data)
   return this;
  }
- render(ctx: Ctx, highlight = false): boolean {
+ render(ctx: Ctx): boolean {
   this.position.lerp(this.targetPosition, 0.1);
 
   if (this.image) {
@@ -93,14 +94,36 @@ export class TierItem {
    ctx.fillText(this.data.text, 0.5, 0.5, 1);
   }
 
-  const offset = 0.02;
-  if (highlight) {
-   ctx.strokeStyle = "white";
-   ctx.lineWidth *= 10;
-   
-   ctx.strokeRect(0 - offset, 0 - offset, 1 + (offset * 2), 1 + (offset * 2));
-  }
-
   return this.position.dist(this.targetPosition) > 0.025;
  }
+}
+
+interface Props {
+  data: TierItemData
+  onChange: (data: TierItemData)=>void;
+}
+interface State {
+
+}
+export class TierItemDisplay extends Component<Props,State> {
+  render() {
+    return <div class="tier-item">
+      { this.props.data.imageUrl &&
+      <div class="tier-item-image"
+      style={{
+        backgroundImage: `url(${this.props.data.imageUrl})`
+      }}
+      ></div>
+      }
+      <textarea
+        class="tier-item-description"
+        value={this.props.data.description||""}
+        onChange={(evt)=>{
+          const t = evt.target as HTMLTextAreaElement;
+          this.props.data.description = t.value
+          this.props.onChange(this.props.data)
+        }}
+        ></textarea>
+    </div>
+  }
 }

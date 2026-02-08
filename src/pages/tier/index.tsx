@@ -2,7 +2,7 @@
 import { Component, createRef, RefObject } from "preact";
 import "./style.css"
 import { Vector } from "../../vector";
-import { TierItem, TierItemData } from "./item";
+import { TierItem, TierItemData, TierItemDisplay } from "./item";
 import { Ctx } from "./types";
 import { TierList } from "./list";
 import { useParams } from "wouter";
@@ -13,6 +13,7 @@ interface Props {
 }
 interface State {
  list: TierList;
+ infoItemData?: TierItemData;
 }
 
 function htmlStringToImgSrc(s: string): string {
@@ -120,10 +121,24 @@ export class Tier extends Component<Props, State> {
   for (const item of this.state.list.items) {
    ctx.save();
    ctx.translate(item.position.x, item.position.y)
-   if (item.render(ctx, this.selectedItem == item)) {
+   if (item.render(ctx)) {
     this.needsRedraw = true;
    }
    ctx.restore();
+  }
+
+  if (this.selectedItem) {
+   ctx.save()
+   ctx.lineWidth *= 10
+   ctx.strokeStyle = "white"
+   ctx.translate(
+    this.selectedItem.position.x,
+    this.selectedItem.position.y
+   )
+
+   const offset = 0.02;
+   ctx.strokeRect(0 - offset, 0 - offset, 1 + (offset * 2), 1 + (offset * 2));
+   ctx.restore()
   }
 
   ctx.strokeRect(
@@ -183,7 +198,7 @@ export class Tier extends Component<Props, State> {
   window.requestAnimationFrame(this.onAnimationFrame)
   setInterval(() => {
    this.needsRedraw = true;
-  }, 1000)
+  }, 500)
   setTimeout(() => {
    this.fixCanvasRes()
   }, 500)
@@ -215,7 +230,7 @@ export class Tier extends Component<Props, State> {
    return;
   }
   if (this.selectedItem) {
-   this.needsRedraw = true
+   // this.needsRedraw = true
    this.saveItem(this.selectedItem.data.id, this.selectedItem.data)
    this.selectedItem = null;
   } else {
@@ -354,7 +369,7 @@ export class Tier extends Component<Props, State> {
   return this.restoreFromLocalStorage()
  }
  render() {
-  const { tierid } = useParams<{tierid: string }>()
+  const { tierid } = useParams<{ tierid: string }>()
 
   this.state.list.id = tierid
 
@@ -487,6 +502,9 @@ export class Tier extends Component<Props, State> {
     </div>
     <div class="item-actions">
      {this.renderItemAction("info", `${BASE}icon_info.svg`, (item) => {
+      this.setState({
+       infoItemData: item.data
+      })
       //TODO - markdown
      })}
      {this.renderItemAction("move", `${BASE}icon_move.svg`, (item) => {
@@ -504,6 +522,14 @@ export class Tier extends Component<Props, State> {
       this.save()
      })}
     </div>
+    {this.state.infoItemData &&
+     <TierItemDisplay
+      data={this.state.infoItemData}
+      onChange={(data)=>{
+       this.saveItem(data.id, data)
+      }}
+      ></TierItemDisplay>
+    }
    </div>
   </div>
  }
