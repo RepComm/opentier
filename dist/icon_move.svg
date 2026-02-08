@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   width="100pt"
+   height="100pt"
+   viewBox="0 0 35.277777 35.277777"
+   version="1.1"
+   id="svg1"
+   inkscape:version="1.4.3 (0d15f75, 2025-12-25)"
+   sodipodi:docname="icon_move.svg"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <sodipodi:namedview
+     id="namedview1"
+     pagecolor="#ffffff"
+     bordercolor="#000000"
+     borderopacity="0.25"
+     inkscape:showpageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="true"
+     inkscape:deskcolor="#6d6d6d"
+     inkscape:document-units="pt"
+     showborder="false"
+     labelstyle="default"
+     inkscape:antialias-rendering="false"
+     showgrid="true"
+     inkscape:zoom="5.6568542"
+     inkscape:cx="85.117979"
+     inkscape:cy="70.710678"
+     inkscape:window-width="1854"
+     inkscape:window-height="1019"
+     inkscape:window-x="0"
+     inkscape:window-y="0"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="layer1"
+     showguides="false" />
+  <defs
+     id="defs1" />
+  <g
+     inkscape:label="Layer 1"
+     inkscape:groupmode="layer"
+     id="layer1">
+    <circle
+       style="fill:#000000;fill-opacity:1;stroke:none;stroke-width:2.20329;stroke-dasharray:none;stroke-opacity:1;paint-order:normal"
+       id="path6"
+       cx="17.638889"
+       cy="17.638889"
+       r="17.638889" />
+    <path
+       id="rect4"
+       style="fill:none;stroke:#ffffff;stroke-width:1.64058;stroke-dasharray:none;stroke-opacity:1;paint-order:normal"
+       d="M 17.638717 4.3030966 L 13.610539 10.243303 L 16.184025 10.243303 L 16.184025 16.190743 L 10.236585 16.190743 L 10.236585 13.617774 L 4.2963786 17.645952 L 10.236585 21.662761 L 10.236585 19.100643 L 16.184025 19.100643 L 16.184025 25.034648 L 13.611056 25.034648 L 17.639234 30.974854 L 21.656043 25.034648 L 19.093925 25.034648 L 19.093925 19.100643 L 25.02793 19.100643 L 25.02793 21.662244 L 30.968136 17.645435 L 25.02793 13.617257 L 25.02793 16.190743 L 19.093925 16.190743 L 19.093925 10.243303 L 21.655526 10.243303 L 17.638717 4.3030966 z " />
+  </g>
+</svg>
