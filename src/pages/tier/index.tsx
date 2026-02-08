@@ -5,11 +5,11 @@ import { Vector } from "../../vector";
 import { TierItem, TierItemData } from "./item";
 import { Ctx } from "./types";
 import { TierList } from "./list";
+import { useParams } from "wouter";
 
 const BASE = import.meta.env.BASE_URL
 
 interface Props {
- tierid: string;
 }
 interface State {
  list: TierList;
@@ -42,8 +42,8 @@ export class Tier extends Component<Props, State> {
  pointerWorldPrev: Vector;
  pointerWorldDelta: Vector;
 
- constructor(props) {
-  super(props);
+ constructor() {
+  super();
 
   this.needsRedraw = true;
   this.canvasRef = createRef();
@@ -62,81 +62,30 @@ export class Tier extends Component<Props, State> {
   this.pointerWorldDelta = new Vector();
   this.pointerIsDown = false;
 
-  console.log("Tier Id", this.props.tierid)
   const demo = new TierList(
-   this.props.tierid,
+   "placeholder",
    "Demo Tier", "abcde")
 
   this.state = {
    list: demo
   }
-
-  const restoreCount = this.restore()
-  console.log("restore count", restoreCount)
-  if (restoreCount < 1) {
-
-   this.item({
-    bg: "red",
-    fg: "white",
-    text: "S",
-    column: 0,
-    row: 0
-   })
-   this.item({
-    bg: "orange",
-    fg: "white",
-    text: "A",
-    column: 0,
-    row: 1
-   })
-   this.item({
-    bg: "yellow",
-    fg: "white",
-    text: "B",
-    column: 0,
-    row: 2
-   })
-   this.item({
-    bg: "green",
-    fg: "white",
-    text: "C",
-    column: 0,
-    row: 3
-   })
-   this.item({
-    bg: "blue",
-    fg: "white",
-    text: "D",
-    column: 0,
-    row: 4
-   })
-   this.item({
-    bg: "purple",
-    fg: "white",
-    text: "F",
-    column: 0,
-    row: 5
-   })
-
-   this.save()
-  }
-
-
  }
  item(data: TierItemData) {
-  
+
   const x = data.column
   const y = data.row
 
   data.column = Math.floor(data.column)
   data.row = Math.floor(data.row)
 
-  const item = new TierItem().setData(data)
+  const item = new TierItem().setData(data, this.getKeyPrefix())
   item.position.set(x, y)
 
   this.state.list.items.add(
    item
   )
+
+  this.saveItem(item.data.id, item.data)
  }
 
  renderCanvas() {
@@ -240,7 +189,7 @@ export class Tier extends Component<Props, State> {
   }, 500)
  }
  onPointerDown() {
-  console.log(this.pointerWorld)
+  // console.log(this.pointerWorld)
  }
  findItemUnderPointer(): TierItem {
   for (const item of this.state.list.items) {
@@ -266,7 +215,8 @@ export class Tier extends Component<Props, State> {
    return;
   }
   if (this.selectedItem) {
-   this.save()
+   this.needsRedraw = true
+   this.saveItem(this.selectedItem.data.id, this.selectedItem.data)
    this.selectedItem = null;
   } else {
    this.selectedItem = item;
@@ -350,13 +300,26 @@ export class Tier extends Component<Props, State> {
   return `${this.state.list.id}:`
  }
 
- saveToLocalStorage() {
-  // localStorage.setItem()
+ saveItemLocalStorage(key: string, data?: TierItemData) {
+  if (!data) {
+   localStorage.removeItem(key)
+   return
+  }
+  const value = JSON.stringify(data)
+  console.log("save item", key, value)
+
+  localStorage.setItem(key, value)
+ }
+ saveItem(key: string, data?: TierItemData) {
+  return this.saveItemLocalStorage(key, data)
+ }
+
+ save() {
   const items = this.state.list.items;
   const prefix = this.getKeyPrefix()
 
   //remove old keys
-  for (let i=0; i<localStorage.length; i++) {
+  for (let i = 0; i < localStorage.length; i++) {
    const key = localStorage.key(i)
    if (!key.startsWith(prefix)) continue;
    localStorage.removeItem(key)
@@ -364,15 +327,12 @@ export class Tier extends Component<Props, State> {
 
   let i = 0;
   for (const item of items) {
+
    const key = `${prefix}${i}`
-   console.log("saving key", key)
-   const value = JSON.stringify(item.data)
-   localStorage.setItem(key, value)
+
+   this.saveItem(key, item.data)
    i++
   }
- }
- save() {
-  this.saveToLocalStorage()
  }
  restoreFromLocalStorage(): number {
   const prefix = this.getKeyPrefix()
@@ -394,6 +354,59 @@ export class Tier extends Component<Props, State> {
   return this.restoreFromLocalStorage()
  }
  render() {
+  const { tierid } = useParams<{tierid: string }>()
+
+  this.state.list.id = tierid
+
+
+  const restoreCount = this.restore()
+  console.log("restore count", restoreCount)
+  if (restoreCount < 1) {
+
+   this.item({
+    bg: "red",
+    fg: "white",
+    text: "S",
+    column: 0,
+    row: 0
+   })
+   this.item({
+    bg: "orange",
+    fg: "white",
+    text: "A",
+    column: 0,
+    row: 1
+   })
+   this.item({
+    bg: "yellow",
+    fg: "white",
+    text: "B",
+    column: 0,
+    row: 2
+   })
+   this.item({
+    bg: "green",
+    fg: "white",
+    text: "C",
+    column: 0,
+    row: 3
+   })
+   this.item({
+    bg: "blue",
+    fg: "white",
+    text: "D",
+    column: 0,
+    row: 4
+   })
+   this.item({
+    bg: "purple",
+    fg: "white",
+    text: "F",
+    column: 0,
+    row: 5
+   })
+  }
+
   return <div class="tier">
 
    <div class="col" style={{ flex: 1 }}>
@@ -461,8 +474,6 @@ export class Tier extends Component<Props, State> {
           row: this.pointerWorld.y,
           imageUrl: src
          })
-
-         this.save()
         }
 
        }}
@@ -476,7 +487,7 @@ export class Tier extends Component<Props, State> {
     </div>
     <div class="item-actions">
      {this.renderItemAction("info", `${BASE}icon_info.svg`, (item) => {
-      console.log("action info", item)
+      //TODO - markdown
      })}
      {this.renderItemAction("move", `${BASE}icon_move.svg`, (item) => {
       if (!this.selectedItem) return;
@@ -485,6 +496,11 @@ export class Tier extends Component<Props, State> {
      {this.renderItemAction("delete", `${BASE}icon_delete.svg`, (item) => {
       if (!this.selectedItem) return;
       this.state.list.items.delete(this.selectedItem)
+      this.save()
+     })}
+     {this.renderItemAction("clear", `${BASE}icon_clear.svg`, (item) => {
+      if (!confirm("Clear everything?")) return
+      this.state.list.items.clear()
       this.save()
      })}
     </div>
