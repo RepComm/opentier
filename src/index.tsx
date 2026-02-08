@@ -1,5 +1,8 @@
 import { render } from 'preact';
-import { LocationProvider, Router, Route } from 'preact-iso';
+import { LocationProvider } from 'preact-iso';
+
+import { Router, Route } from "wouter";
+import { useHashLocation } from "wouter/use-hash-location"
 
 import { Header } from './components/Header.jsx';
 import { Home } from './pages/Home/index.jsx';
@@ -18,10 +21,9 @@ export function App() {
 		<LocationProvider>
 			<Header />
 			<main>
-				<Router>
+				<Router hook={useHashLocation}>
 					<Route path="/" component={Home} />
 					<Route path="/:tierid" component={Tier} />
-					<Route default component={Home} />
 				</Router>
 			</main>
 		</LocationProvider>
