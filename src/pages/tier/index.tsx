@@ -40,8 +40,9 @@ export class Tier extends Component<Props, State> {
  pointerWorldPrev: Vector;
  pointerWorldDelta: Vector;
 
- constructor() {
-  super();
+ constructor(props) {
+  super(props);
+
   this.needsRedraw = true;
   this.canvasRef = createRef();
 
@@ -59,39 +60,77 @@ export class Tier extends Component<Props, State> {
   this.pointerWorldDelta = new Vector();
   this.pointerIsDown = false;
 
-  const demo = new TierList("abcd", "Demo Tier", "abcde")
-
+  console.log("Tier Id", this.props.tierid)
+  const demo = new TierList(
+   this.props.tierid,
+   "Demo Tier", "abcde")
 
   this.state = {
    list: demo
   }
 
-  this.item("red", "white", "X", 1, 0,
-   "https://alishabmarie.wordpress.com/wp-content/uploads/2015/05/photo-3.png"
-  )
-  this.item("red", "white", "X", 1, 1,
-   "https://alishabmarie.wordpress.com/wp-content/uploads/2015/05/photo-3.png"
-  )
+  const restoreCount = this.restore()
+  console.log("restore count", restoreCount)
+  if (restoreCount < 1) {
 
-  this.item("red", "white", "S", 0, 0)
-  this.item("orange", "white", "A", 0, 1)
-  this.item("yellow", "white", "B", 0, 2)
-  this.item("green", "white", "C", 0, 3)
-  this.item("blue", "white", "D", 0, 4)
-  this.item("purple", "white", "F", 0, 5)
+   this.item({
+    bg: "red",
+    fg: "white",
+    text: "S",
+    column: 0,
+    row: 0
+   })
+   this.item({
+    bg: "orange",
+    fg: "white",
+    text: "A",
+    column: 0,
+    row: 1
+   })
+   this.item({
+    bg: "yellow",
+    fg: "white",
+    text: "B",
+    column: 0,
+    row: 2
+   })
+   this.item({
+    bg: "green",
+    fg: "white",
+    text: "C",
+    column: 0,
+    row: 3
+   })
+   this.item({
+    bg: "blue",
+    fg: "white",
+    text: "D",
+    column: 0,
+    row: 4
+   })
+   this.item({
+    bg: "purple",
+    fg: "white",
+    text: "F",
+    column: 0,
+    row: 5
+   })
+
+   this.save()
+  }
+
 
  }
- item(bg: string, fg: string, text: string, col: number, row: number, imageUrl: string = undefined) {
-  const x = Math.floor(col)
-  const y = Math.floor(row)
+ item(data: TierItemData) {
+  
+  const x = data.column
+  const y = data.row
 
-  const item = new TierItem(bg, fg, text).setData({
-   column: x,
-   row: y,
-   id: text,
-   imageUrl
-  })
-  item.position.set(col, row)
+  data.column = Math.floor(data.column)
+  data.row = Math.floor(data.row)
+
+  const item = new TierItem().setData(data)
+  item.position.set(x, y)
 
   this.state.list.items.add(
    item
@@ -215,13 +254,17 @@ export class Tier extends Component<Props, State> {
   return null;
  }
  selectedItem: TierItem;
+ selectedItemMove: boolean;
+
  onPointerUp() {
+  this.selectedItemMove = false;
   const item = this.findItemUnderPointer()
   if (item == null) {
    this.selectedItem = null;
    return;
   }
   if (this.selectedItem) {
+   this.save()
    this.selectedItem = null;
   } else {
    this.selectedItem = item;
@@ -284,75 +327,165 @@ export class Tier extends Component<Props, State> {
   }
   return result
  }
+ renderItemAction(label: string, imgUrl: string, action: (item: TierItem) => void) {
+  return <div
+   class="item-action"
+   onClick={() => {
+    action(this.selectedItem)
+   }}
+  >
+   <div class="item-action-icon"
+    style={{
+     backgroundImage: `url("${imgUrl}")`
+    }}
+   ></div>
+   {label &&
+    <span>{label}</span>
+   }
+  </div>
+ }
+ getKeyPrefix() {
+  return `${this.state.list.id}:`
+ }
+
+ saveToLocalStorage() {
+  // localStorage.setItem()
+  const items = this.state.list.items;
+  const prefix = this.getKeyPrefix()
+
+  //remove old keys
+  for (let i=0; i<localStorage.length; i++) {
+   const key = localStorage.key(i)
+   if (!key.startsWith(prefix)) continue;
+   localStorage.removeItem(key)
+  }
+
+  let i = 0;
+  for (const item of items) {
+   const key = `${prefix}${i}`
+   console.log("saving key", key)
+   const value = JSON.stringify(item.data)
+   localStorage.setItem(key, value)
+   i++
+  }
+ }
+ save() {
+  this.saveToLocalStorage()
+ }
+ restoreFromLocalStorage(): number {
+  const prefix = this.getKeyPrefix()
+
+  let count = 0;
+  for (let i = 0; i < localStorage.length; i++) {
+   const k = localStorage.key(i)
+   if (!k.startsWith(prefix)) continue
+   const vText = localStorage.getItem(k)
+   const vJson = JSON.parse(vText) as TierItemData;
+
+   count++
+   this.item(vJson)
+
+  }
+  return count
+ }
+ restore(): number {
+  return this.restoreFromLocalStorage()
+ }
  render() {
   return <div class="tier">
 
-   <div class="container">
-    <canvas
-     ref={this.canvasRef}
-     onWheel={(evt) => {
-      this.zoomAmount -= (evt.deltaY * this.zoomWheelRate) * this.zoomAmount;
+   <div class="col" style={{ flex: 1 }}>
 
-      if (this.zoomAmount < this.zoomMin) {
-       this.zoomAmount = this.zoomMin;
-      } else if (this.zoomAmount > this.zoomMax) {
-       this.zoomAmount = this.zoomMax;
+    <div class="row" style={{ flex: 1 }}>
+     <div class="container">
+      <canvas
+       ref={this.canvasRef}
+       onWheel={(evt) => {
+        this.zoomAmount -= (evt.deltaY * this.zoomWheelRate) * this.zoomAmount;
+
+        if (this.zoomAmount < this.zoomMin) {
+         this.zoomAmount = this.zoomMin;
+        } else if (this.zoomAmount > this.zoomMax) {
+         this.zoomAmount = this.zoomMax;
+        }
+        this.needsRedraw = true;
+       }}
+       onPointerDown={(evt) => {
+        this.pointerEventUpdatePosition(evt);
+        this.onPointerDown();
+        this.pointerIsDown = true;
+       }}
+       onPointerUp={(evt) => {
+        this.pointerEventUpdatePosition(evt);
+        this.onPointerUp();
+        this.pointerIsDown = false;
+       }}
+       onPointerMove={(evt) => {
+        this.pointerEventUpdatePosition(evt);
+        if (this.selectedItem && this.selectedItemMove) {
+         this.selectedItem.data.column =
+          this.selectedItem.targetPosition.x =
+          Math.floor(this.pointerWorld.x)
+
+         this.selectedItem.data.row =
+          this.selectedItem.targetPosition.y =
+          Math.floor(this.pointerWorld.y)
+        } else if (this.pointerIsDown) {
+         this.translation.add(this.pointerWorldDelta);
+        }
+        this.needsRedraw = true;
+
+       }}
+       onDragOver={(evt) => {
+        evt.preventDefault()
+       }}
+       onDrop={(evt) => {
+        evt.preventDefault()
+        this.pointerEventUpdatePosition(evt)
+
+
+        const html = evt.dataTransfer.getData("text/html")
+        const uris = evt.dataTransfer.getData("text/uri-list")
+        const text = evt.dataTransfer.getData("text/plain")
+
+        if (html) {
+         const src = htmlStringToImgSrc(html)
+
+         this.item({
+          fg: "black",
+          bg: "white",
+          text: "x",
+          column: this.pointerWorld.x,
+          row: this.pointerWorld.y,
+          imageUrl: src
+         })
+
+         this.save()
+        }
+
+       }}
+      />
+     </div>
+     {/* <div class="drawer">
+      {this.state.list &&
+       this.renderDrawerItems()
       }
-      this.needsRedraw = true;
-     }}
-     onPointerDown={(evt) => {
-      this.pointerEventUpdatePosition(evt);
-      this.onPointerDown();
-      this.pointerIsDown = true;
-     }}
-     onPointerUp={(evt) => {
-      this.pointerEventUpdatePosition(evt);
-      this.onPointerUp();
-      this.pointerIsDown = false;
-     }}
-     onPointerMove={(evt) => {
-      this.pointerEventUpdatePosition(evt);
-      if (this.selectedItem) {
-       this.selectedItem.targetPosition.x = Math.floor(this.pointerWorld.x)
-       this.selectedItem.targetPosition.y = Math.floor(this.pointerWorld.y)
-      } else if (this.pointerIsDown) {
-       this.translation.add(this.pointerWorldDelta);
-      }
-      this.needsRedraw = true;
-
-     }}
-     onDragOver={(evt) => {
-      evt.preventDefault()
-     }}
-     onDrop={(evt) => {
-      evt.preventDefault()
-      this.pointerEventUpdatePosition(evt)
-
-
-      const html = evt.dataTransfer.getData("text/html")
-      const uris = evt.dataTransfer.getData("text/uri-list")
-      const text = evt.dataTransfer.getData("text/plain")
-
-      if (html) {
-       const src = htmlStringToImgSrc(html)
-       
-       this.item(
-        "black",
-        "white",
-        "x",
-        this.pointerWorld.x,
-        this.pointerWorld.y,
-        src
-       )
-      }
-      
-     }}
-    />
-   </div>
-   <div class="drawer">
-    {this.state.list &&
-     this.renderDrawerItems()
-    }
+     </div> */}
+    </div>
+    <div class="item-actions">
+     {this.renderItemAction("info", "/icon_info.svg", (item) => {
+      console.log("action info", item)
+     })}
+     {this.renderItemAction("move", "/icon_move.svg", (item) => {
+      if (!this.selectedItem) return;
+      this.selectedItemMove = true;
+     })}
+     {this.renderItemAction("delete", "/icon_delete.svg", (item) => {
+      if (!this.selectedItem) return;
+      this.state.list.items.delete(this.selectedItem)
+      this.save()
+     })}
+    </div>
    </div>
   </div>
  }

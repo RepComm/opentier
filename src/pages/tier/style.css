@@ -33,3 +33,27 @@
  cursor: grab;
  width: 100%;
 }
+
+.item-actions {
+ display: flex;
+ height: min-content;
+}
+
+.item-action {
+ display: flex;
+ flex-direction: column;
+ cursor: pointer;
+ background-color: #313131;
+ border-radius: 0.5rem;
+ align-items: center;
+}
+.item-action:hover, .item-action:active {
+ background-color: #444444;
+}
+
+.item-action-icon {
+ justify-self: center;
+ height: 2em;
+ width: 2em;
+ background-size: contain;
+}
