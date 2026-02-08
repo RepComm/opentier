@@ -6,6 +6,8 @@ import { TierItem, TierItemData } from "./item";
 import { Ctx } from "./types";
 import { TierList } from "./list";
 
+const BASE = import.meta.env.BASE_URL
+
 interface Props {
  tierid: string;
 }
@@ -473,14 +475,14 @@ export class Tier extends Component<Props, State> {
      </div> */}
     </div>
     <div class="item-actions">
-     {this.renderItemAction("info", "/icon_info.svg", (item) => {
+     {this.renderItemAction("info", `${BASE}icon_info.svg`, (item) => {
       console.log("action info", item)
      })}
-     {this.renderItemAction("move", "/icon_move.svg", (item) => {
+     {this.renderItemAction("move", `${BASE}icon_move.svg`, (item) => {
       if (!this.selectedItem) return;
       this.selectedItemMove = true;
      })}
-     {this.renderItemAction("delete", "/icon_delete.svg", (item) => {
+     {this.renderItemAction("delete", `${BASE}icon_delete.svg`, (item) => {
       if (!this.selectedItem) return;
       this.state.list.items.delete(this.selectedItem)
       this.save()
